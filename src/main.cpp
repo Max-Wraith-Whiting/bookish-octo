@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits>
+#include <ranges>
 
 #include "random.hpp"
 
@@ -32,19 +33,31 @@ namespace MultiplyGame {
         int guess {};
     };
     
-    void askQuestion(Question& q)
+    bool askQuestion(Question& q)
     {
         std::cout << q.multiplicand << " x " << q.multiplier << " = ";
         q.guess = getInput();
+        bool isCorrect {(q.multiplicand * q.multiplier) == q.guess};
 
-        std::string result {((q.multiplicand * q.multiplier) == q.guess) ? "true" : "false"};
+        std::cout << (isCorrect ? "Correct!" : "Incorrect!") << '\n';
 
-        std::cout << q.multiplicand << " x " << q.multiplier << " = " << q.guess << " is " << result << ".\n";
+        return isCorrect;
+    }
+
+    void playGame(int questionAmount) {
+        int totalScore {0};
+        for (int i : std::views::iota(1, questionAmount + 1)) {
+            Question q {Random::get(1,12), Random::get(1,12)};
+            std::cout << i << ". ";
+            if (askQuestion(q)) {
+                ++totalScore;
+            }
+        }
+        std::cout << "You scored " << totalScore << " out of " << questionAmount << '\n';
     }
 }
 
 int main()
 {
-    MultiplyGame::Question q {Random::get(1,12), Random::get(1,12)};
-    MultiplyGame::askQuestion(q);
+    MultiplyGame::playGame(4);
 }
