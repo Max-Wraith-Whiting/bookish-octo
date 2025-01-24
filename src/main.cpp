@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <ranges>
+#include <vector>
 
 #include "random.hpp"
 
@@ -32,10 +33,30 @@ namespace MultiplyGame {
         int multiplier {};
         int guess {};
     };
+
+    struct Game {
+        int totalScore {0};
+        int questionCount {0};
+        std::vector<Question> questionVector {};
+    };
+
+    Game& generateQuestions(Game& game, const int questionAmount)
+    {
+        for ([[maybe_unused]] int i : std::views::iota(1, questionAmount + 1)) {
+            game.questionVector.push_back(Question {Random::get(1,12), Random::get(1,12)});
+        }
+        game.questionCount = questionAmount;
+        return game;
+    }
     
-    bool askQuestion(Question& q)
+    void printQuestion(const Question& q)
     {
         std::cout << q.multiplicand << " x " << q.multiplier << " = ";
+    }
+
+    bool askQuestion(Question& q)
+    {
+        printQuestion(q);
         q.guess = getInput();
         bool isCorrect {(q.multiplicand * q.multiplier) == q.guess};
 
@@ -44,16 +65,16 @@ namespace MultiplyGame {
         return isCorrect;
     }
 
-    void playGame(int questionAmount) {
-        int totalScore {0};
-        for (int i : std::views::iota(1, questionAmount + 1)) {
-            Question q {Random::get(1,12), Random::get(1,12)};
-            std::cout << i << ". ";
-            if (askQuestion(q)) {
-                ++totalScore;
-            }
+    void playGame(const int questionAmount) {
+        Game game {};
+
+        game = generateQuestions(game, questionAmount);
+        for (Question& q : game.questionVector) {
+            if (askQuestion(q))
+                game.totalScore++;
         }
-        std::cout << "You scored " << totalScore << " out of " << questionAmount << '\n';
+        
+        std::cout << "You scored " << game.totalScore << " out of " << questionAmount << '\n';
     }
 }
 
