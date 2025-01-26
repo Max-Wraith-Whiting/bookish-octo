@@ -2,6 +2,7 @@
 #include <limits>
 #include <ranges>
 #include <vector>
+#include <ranges>
 
 #include "random.hpp"
 
@@ -34,51 +35,62 @@ namespace MultiplyGame {
         int guess {};
     };
 
-    struct Game {
-        int totalScore {0};
-        int questionCount {0};
+    class Game
+    {
+    private:
+        int totalScore {};
+        int questionAmount {};
         std::vector<Question> questionVector {};
+
+        void printQuestion(const Question& q)
+        {
+            std::cout << q.multiplicand << " x " << q.multiplier << " = ";
+        }
+
+        void generateQuestions()
+        {
+            for ([[maybe_unused]] int i : std::views::iota(1, questionAmount + 1)) {
+                questionVector.push_back(Question {Random::get(1,12), Random::get(1,12)});
+            }
+            return;
+        }
+
+        // Would be better as a pure function. (Question struct needs to lose guess field.)
+        bool askQuestion(Question& q)
+        {
+            printQuestion(q);
+            q.guess = getInput();
+            bool isCorrect {(q.multiplicand * q.multiplier) == q.guess};
+
+            std::cout << (isCorrect ? "Correct!" : "Incorrect!") << '\n'; // TODO: Replace this with something not bad.
+
+            return isCorrect;
+        }
+
+    public:
+        Game() = default;
+
+        Game(int qCount) {
+            questionAmount = qCount;
+        }
+
+        ~Game() = default;
+
+        void playGame() 
+        {
+            generateQuestions();
+            for (Question& q : questionVector) {
+                if (askQuestion(q))
+                    totalScore++;
+            }
+            
+            std::cout << "You scored " << totalScore << " out of " << questionAmount << '\n';
+        }
     };
-
-    Game& generateQuestions(Game& game, const int questionAmount)
-    {
-        for ([[maybe_unused]] int i : std::views::iota(1, questionAmount + 1)) {
-            game.questionVector.push_back(Question {Random::get(1,12), Random::get(1,12)});
-        }
-        game.questionCount = questionAmount;
-        return game;
-    }
-    
-    void printQuestion(const Question& q)
-    {
-        std::cout << q.multiplicand << " x " << q.multiplier << " = ";
-    }
-
-    bool askQuestion(Question& q)
-    {
-        printQuestion(q);
-        q.guess = getInput();
-        bool isCorrect {(q.multiplicand * q.multiplier) == q.guess};
-
-        std::cout << (isCorrect ? "Correct!" : "Incorrect!") << '\n';
-
-        return isCorrect;
-    }
-
-    void playGame(const int questionAmount) {
-        Game game {};
-
-        game = generateQuestions(game, questionAmount);
-        for (Question& q : game.questionVector) {
-            if (askQuestion(q))
-                game.totalScore++;
-        }
-        
-        std::cout << "You scored " << game.totalScore << " out of " << questionAmount << '\n';
-    }
 }
 
 int main()
 {
-    MultiplyGame::playGame(4);
+    MultiplyGame::Game game {5};
+    game.playGame();
 }
