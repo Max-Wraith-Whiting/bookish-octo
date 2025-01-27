@@ -37,9 +37,9 @@ namespace MultiplyGame {
     class Game
     {
     private:
-        int totalScore {};
-        int questionAmount {};
-        std::vector<Question> questionVector {};
+        int m_totalScore {};
+        int m_questionAmount {5};
+        std::vector<Question> m_questionVector {};
 
         void printQuestion(const Question& q)
         {
@@ -48,8 +48,8 @@ namespace MultiplyGame {
 
         void generateQuestions()
         {
-            for ([[maybe_unused]] int i : std::views::iota(1, questionAmount + 1)) {
-                questionVector.push_back(Question {Random::get(1,12), Random::get(1,12)});
+            for ([[maybe_unused]] int i : std::views::iota(1, m_questionAmount + 1)) {
+                m_questionVector.push_back(Question {Random::get(1,12), Random::get(1,12)});
             }
             return;
         }
@@ -66,23 +66,19 @@ namespace MultiplyGame {
         }
 
     public:
-        Game() = default;
-
-        Game(int qCount) {
-            questionAmount = qCount;
+        Game(int qCount) : m_questionAmount {qCount}
+        {
         }
-
-        ~Game() = default;
 
         void playGame() 
         {
             generateQuestions();
-            for (Question& q : questionVector) {
+            for (Question& q : m_questionVector) {
                 if (askQuestion(q))
-                    totalScore++;
+                    m_totalScore++;
             }
             
-            std::cout << "You scored " << totalScore << " out of " << questionAmount << '\n';
+            std::cout << "You scored " << m_totalScore << " out of " << m_questionAmount << '\n';
         }
     };
 }
