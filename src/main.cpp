@@ -32,7 +32,6 @@ namespace MultiplyGame {
     struct Question {
         int multiplicand {};
         int multiplier {};
-        int guess {};
     };
 
     class Game
@@ -55,12 +54,11 @@ namespace MultiplyGame {
             return;
         }
 
-        // Would be better as a pure function. (Question struct needs to lose guess field.)
-        bool askQuestion(Question& q)
+        bool askQuestion(const Question& q)
         {
             printQuestion(q);
-            q.guess = getInput();
-            bool isCorrect {(q.multiplicand * q.multiplier) == q.guess};
+            int guess = getInput();
+            bool isCorrect {(q.multiplicand * q.multiplier) == guess};
 
             std::cout << (isCorrect ? "Correct!" : "Incorrect!") << '\n'; // TODO: Replace this with something not bad.
 
